@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16
+    container_name: ct_user
+    environment:
+      POSTGRES_USER: ct_user
+      POSTGRES_PASSWORD: ct_pass
+      POSTGRES_DB: conversation_tree
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgres/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ct_user -d conversation_tree"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  
+  # redis:
+  #   image: redis:7
+  #   container_name: ct_redis
+  #   ports:
+  #     - "6379:6379"
+  #   command: ["redis-server", "--appendonly", "yes"]
+
+volumes:
+  pgdata:
