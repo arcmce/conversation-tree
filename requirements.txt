@@ -6,3 +6,5 @@ pydantic
 celery[redis]
 redis
 python-dotenv
+openai
+numpy
