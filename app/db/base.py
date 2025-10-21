@@ -1,3 +1,4 @@
-from sqlalchemy.orm import declarative_base
+from app.db.base_class import Base
 
-Base = declarative_base()
+from app.models.conversation import Conversation # noqa
+from app.models.turn import Turn # noqa
