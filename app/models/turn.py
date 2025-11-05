@@ -12,4 +12,4 @@ class Turn(Base):
     embedding = Column(ARRAY(Float), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
-    conversation = relationship("Conversation", backref="turns")
+    conversation = relationship("Conversation", back_populates="turns")

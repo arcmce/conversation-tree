@@ -4,7 +4,7 @@ from typing import List
 from app.db.session import get_db
 from app.models.conversation import Conversation
 from app.models.turn import Turn
-from app.schemas.turn import TurnCreate, TurnOut
+from app.schemas.turn import TurnCreate, TurnOut, TurnOutDebug
 from app.ai.embeddings import embed_text, cosine_similarity
 
 router = APIRouter(prefix="/conversations", tags=["Turns"])
@@ -17,9 +17,9 @@ def add_turn(conversation_id: int, payload: TurnCreate, db: Session = Depends(ge
 
     vec = embed_text(payload.content)
     turn = Turn(
-        conversation_id=conversation_id, 
-        role=payload.role, 
-        content=payload.content, 
+        conversation_id=conversation_id,
+        role=payload.role,
+        content=payload.content,
         embedding=vec)
     db.add(turn)
     db.commit()
@@ -27,7 +27,7 @@ def add_turn(conversation_id: int, payload: TurnCreate, db: Session = Depends(ge
 
     return turn
 
-@router.get("/{conversation_id}/turns", response_model=List[TurnOut])
+@router.get("/{conversation_id}/turns", response_model=List[TurnOutDebug], response_model_exclude={"embedding"})
 def list_turns(conversation_id: int, db: Session = Depends(get_db)):
     conv = db.get(Conversation, conversation_id)
     if not conv:
@@ -37,9 +37,9 @@ def list_turns(conversation_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{conversation_id}/ask")
 def ask(
-    conversation_id: int, 
-    query: str = Query(..., description="User Question"), 
-    top_k: int = Query(5, ge=1, le=50), 
+    conversation_id: int,
+    query: str = Query(..., description="User Question"),
+    top_k: int = Query(5, ge=1, le=50),
     db: Session = Depends(get_db)
 ):
     conv = db.get(Conversation, conversation_id)
@@ -55,9 +55,9 @@ def ask(
     scored.sort(key=lambda x: x[0], reverse=True)
     top = [
         {
-            "turn_id": t.id, 
-            "role": t.role, 
-            "content": t.content, 
+            "turn_id": t.id,
+            "role": t.role,
+            "content": t.content,
             "score": round(s, 4)
         }
         for s, t in scored[:top_k]
